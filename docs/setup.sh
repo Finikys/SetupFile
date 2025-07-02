@@ -36,7 +36,10 @@ PACKAGES=(
 )
 
 echo "📦 Installing official packages…"
-sudo pacman -S --noconfirm --needed "${PACKAGES[@]}"
+if ! sudo pacman -S --noconfirm "${PACKAGES[@]}"; then
+  echo "→ Conflicts detected. Retrying with auto-confirm…"
+  yes | sudo pacman -S "${PACKAGES[@]}"
+fi
 
 # Install AUR packages
 if ! command -v yay &>/dev/null; then
