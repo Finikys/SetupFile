@@ -23,13 +23,22 @@ for pkg in "${PKGS[@]}"; do
   fi
 done
 
-echo "System updating..."
-sudo pacman -Syu --noconfirm
+# Update system
+echo "🔁 Updating system and installing packages…"
+if ! sudo pacman -Syu --noconfirm; then
+  echo "→ Conflicts detected. Retrying with auto-confirm…"
+  yes | sudo pacman -Syu
+fi
 
-echo "Install packages..."
-sudo pacman -S --noconfirm --needed git mpv telegram-desktop discord steam btop curl perl
+# Install packages
+PACKAGES=(
+  git mpv telegram-desktop discord steam btop curl perl
+)
 
-# Установка yay из AUR, если не найден
+echo "📦 Installing official packages…"
+sudo pacman -S --noconfirm --needed "${PACKAGES[@]}"
+
+# Install AUR packages
 if ! command -v yay &>/dev/null; then
     echo "Yay not found, installing..."
     sudo pacman -S --needed git base-devel
@@ -40,8 +49,9 @@ if ! command -v yay &>/dev/null; then
     rm -rf /tmp/yay
 fi
 
-echo "Install yay packages..."
-yay -S --noconfirm --needed google-chrome v2rayn
+AUR_PACKAGES=(google-chrome v2rayn)
+echo "📦 Installing AUR packages…"
+yay -S --noconfirm --needed "${AUR_PACKAGES[@]}"
 
 # mpv configurate
 mkdir -p ~/.config/mpv/scripts
