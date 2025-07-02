@@ -14,7 +14,7 @@ while true; do
 done
 
 echo "Deleting packages..."
-PKGS=(vim mplayer totem ...)
+PKGS=(mplayer totem alacritty gnome-maps gnome-software gnome-terminal htop)
 for pkg in "${PKGS[@]}"; do
   if pacman -Q "$pkg" &>/dev/null; then
     sudo pacman -R --noconfirm "$pkg"
