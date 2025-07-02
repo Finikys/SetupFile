@@ -1,22 +1,44 @@
-# Delete packages
+#!/usr/bin/env bash
+set -e
+trap 'echo "Oopsie! Error on line $LINENO — but Astolfo never gives up!"' ERR
+
+echo "☆ Astolfo-chan, the eternally optimistic and mischievous paladin, here! 🌟"
+while true; do
+  read -r -p "Shall I sparkle your system with my magical dance and proceed? (y/n): " -n 1
+  echo
+  case $REPLY in
+    [yY]) echo "Yay~ Let's ride the rainbow together! 🌈"; break ;;
+    [nN]) echo "Aww, you’re not letting me perform… Maybe next time, senpai!"; exit 1 ;;
+    *) echo "Hehe… press y or n, ok? ☆";;
+  esac
+done
+
 echo "Deleting packages..."
 sudo pacman -R --noconfirm vim mplayer totem alacritty gnome-maps gnome-software gnome-terminal htop
 
-# Update system
 echo "System updating..."
 sudo pacman -Syu --noconfirm
 
-# Install Packages
 echo "Install packages..."
-sudo pacman -S --noconfirm git neovim mpv telegram-desktop discord steam btop curl perl
+sudo pacman -S --noconfirm --needed git neovim mpv telegram-desktop discord steam btop curl perl
 
-# yay install packages
+# Установка yay из AUR, если не найден
+if ! command -v yay &>/dev/null; then
+    echo "Yay not found, installing..."
+    sudo pacman -S --needed git base-devel
+    git clone https://aur.archlinux.org/yay.git /tmp/yay
+    cd /tmp/yay
+    makepkg -si --noconfirm
+    cd -
+    rm -rf /tmp/yay
+fi
+
 echo "Install yay packages..."
-yay -S --noconfirm google-chrome v2rayn
+yay -S --noconfirm --needed google-chrome v2rayn
 
 # mpv configurate
 mkdir -p ~/.config/mpv/scripts
-curl -L -o ~/.config/mpv/scripts/fuzzydir.lua https://github.com/sibwaf/mpv-scripts/blob/master/fuzzydir.lua
+curl -L -o ~/.config/mpv/scripts/fuzzydir.lua https://raw.githubusercontent.com/sibwaf/mpv-scripts/master/fuzzydir.lua
 CONF_FILE=~/.config/mpv/mpv.conf
 
 LINES_TO_ADD=(
