@@ -14,13 +14,20 @@ while true; do
 done
 
 echo "Deleting packages..."
-sudo pacman -R --noconfirm vim mplayer totem alacritty gnome-maps gnome-software gnome-terminal htop
+PKGS=(vim mplayer totem ...)
+for pkg in "${PKGS[@]}"; do
+  if pacman -Q "$pkg" &>/dev/null; then
+    sudo pacman -R --noconfirm "$pkg"
+  else
+    echo "Package '$pkg' not installed, skipping."
+  fi
+done
 
 echo "System updating..."
 sudo pacman -Syu --noconfirm
 
 echo "Install packages..."
-sudo pacman -S --noconfirm --needed git neovim mpv telegram-desktop discord steam btop curl perl
+sudo pacman -S --noconfirm --needed git mpv telegram-desktop discord steam btop curl perl
 
 # Установка yay из AUR, если не найден
 if ! command -v yay &>/dev/null; then
