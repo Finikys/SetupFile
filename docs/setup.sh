@@ -32,14 +32,12 @@ fi
 
 # Install packages
 PACKAGES=(
-  git mpv telegram-desktop discord steam btop curl perl
+  git mpv telegram-desktop discord steam btop curl perl qbittorrent
 )
 
 echo "📦 Installing official packages…"
-if ! sudo pacman -S --noconfirm "${PACKAGES[@]}"; then
-  echo "→ Conflicts detected. Retrying with auto-confirm…"
-  yes '' | sudo pacman -S "${PACKAGES[@]}"
-fi
+sudo pacman -S "${PACKAGES[@]}"
+
 
 # Install AUR packages
 if ! command -v yay &>/dev/null; then
