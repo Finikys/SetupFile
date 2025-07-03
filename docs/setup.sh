@@ -98,5 +98,40 @@ for key in "${!CONFIG_LINES[@]}"; do
     fi
 done
 
+# ===== ⌨️ Настройка русской раскладки для Hyprland =====
+say "$MAGENTA" "⌨️ Configuring Russian keyboard layout for Hyprland…"
+
+HYPRCONF=~/.config/hypr/hyprland.conf
+mkdir -p ~/.config/hypr
+touch "$HYPRCONF"
+
+# Проверим, есть ли секция input
+if grep -q "^\s*input\s*{" "$HYPRCONF"; then
+    # Удаляем старые настройки kb_layout и kb_options внутри input
+    sed -i '/^\s*input\s*{/,/}/ s/^\s*kb_layout\s*=.*/    kb_layout = us,ru/' "$HYPRCONF"
+    sed -i '/^\s*input\s*{/,/}/ s/^\s*kb_options\s*=.*/    kb_options = grp:alt_shift_toggle/' "$HYPRCONF"
+
+    # Добавляем если их не было
+    if ! grep -Pzo "input\s*{[^}]*\bkb_layout\b" "$HYPRCONF" &>/dev/null; then
+        sed -i '/^\s*input\s*{.*/a \    kb_layout = us,ru' "$HYPRCONF"
+    fi
+    if ! grep -Pzo "input\s*{[^}]*\bkb_options\b" "$HYPRCONF" &>/dev/null; then
+        sed -i '/^\s*input\s*{.*/a \    kb_options = grp:alt_shift_toggle' "$HYPRCONF"
+    fi
+else
+    # Добавим новую секцию input
+    cat >> "$HYPRCONF" <<EOF
+
+# Added by Astolfo's setup script ✨
+input {
+    kb_layout = us,ru
+    kb_variant =
+    kb_options = grp:alt_shift_toggle
+}
+EOF
+fi
+
+say "$GREEN" "→ Russian layout configured! You can switch layouts with Alt+Shift."
+
 # ===== 🎉 Финал =====
 say "$GREEN" "✨ Everything is ready, enjoy your sparkly system, master~!"
