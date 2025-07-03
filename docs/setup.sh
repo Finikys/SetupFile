@@ -36,7 +36,7 @@ PACKAGES=(
 )
 
 echo "📦 Installing official packages…"
-sudo pacman -S "${PACKAGES[@]}"
+sudo pacman -S --needed "${PACKAGES[@]}"
 
 
 # Install AUR packages
@@ -54,23 +54,32 @@ AUR_PACKAGES=(google-chrome v2rayn)
 echo "📦 Installing AUR packages…"
 yay -S --noconfirm --needed "${AUR_PACKAGES[@]}"
 
-# mpv configurate
+# mpv configuration
 mkdir -p ~/.config/mpv/scripts
 curl -L -o ~/.config/mpv/scripts/fuzzydir.lua https://raw.githubusercontent.com/sibwaf/mpv-scripts/master/fuzzydir.lua
+
 CONF_FILE=~/.config/mpv/mpv.conf
 
-LINES_TO_ADD=(
-    "keep-open=yes"
-    "audio-file-auto=fuzzy"
-    "audio-file-paths=**"
-    "sub-auto=fuzzy"
-    "sub-file-path=**"
-    "alang=ru,en,ja"
+declare -A CONFIG_LINES=(
+    ["keep-open"]="yes"
+    ["audio-file-auto"]="fuzzy"
+    ["audio-file-paths"]="**"
+    ["sub-auto"]="fuzzy"
+    ["sub-file-path"]="**"
+    ["alang"]="ru,en,ja"
 )
 
-for line in "${LINES_TO_ADD[@]}"; do
-    if ! grep -Fxq "$line" "$CONF_FILE"; then
-        echo "$line" >> "$CONF_FILE"
+# Создаем файл, если не существует
+touch "$CONF_FILE"
+
+for key in "${!CONFIG_LINES[@]}"; do
+    value="${CONFIG_LINES[$key]}"
+    if grep -q "^$key=" "$CONF_FILE"; then
+        # Заменяем строку
+        sed -i "s|^$key=.*|$key=$value|" "$CONF_FILE"
+    else
+        # Добавляем новую строку
+        echo "$key=$value" >> "$CONF_FILE"
     fi
 done
 
