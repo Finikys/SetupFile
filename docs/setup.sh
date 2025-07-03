@@ -51,7 +51,7 @@ if ! sudo pacman -Syu --noconfirm; then
 fi
 
 # ===== 📦 Установка официальных пакетов =====
-PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent)
+PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian)
 say "$GREEN" "📦 Installing official packages…"
 sudo pacman -S "${PACKAGES[@]}"
 
