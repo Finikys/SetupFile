@@ -51,9 +51,11 @@ if ! sudo pacman -Syu --noconfirm; then
 fi
 
 # ===== 📦 Установка официальных пакетов =====
-PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code)
+PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code tlp)
 say "$GREEN" "📦 Installing official packages…"
 sudo pacman -S "${PACKAGES[@]}"
+
+sudo systemctl enable tlp --now 
 
 # ===== 🚀 Установка yay и AUR-пакетов =====
 if ! command -v yay &>/dev/null; then
