@@ -33,7 +33,7 @@ done
 
 # ===== ❌ Удаление пакетов =====
 say "$RED" "Removing unnecessary packages..."
-PKGS=(mplayer totem alacritty gnome-maps gnome-software gnome-terminal htop)
+PKGS=(mplayer totem alacritty gnome-maps gnome-software gnome-terminal htop firefox-i18n-ru firefox)
 for pkg in "${PKGS[@]}"; do
   if pacman -Q "$pkg" &>/dev/null; then
     sudo pacman -R --noconfirm "$pkg"
@@ -51,7 +51,7 @@ if ! sudo pacman -Syu --noconfirm; then
 fi
 
 # ===== 📦 Установка официальных пакетов =====
-PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian)
+PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code)
 say "$GREEN" "📦 Installing official packages…"
 sudo pacman -S "${PACKAGES[@]}"
 
