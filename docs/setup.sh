@@ -33,7 +33,7 @@ done
 
 # ===== ❌ Удаление пакетов =====
 say "$RED" "Removing unnecessary packages..."
-PKGS=(mplayer totem alacritty gnome-maps gnome-software gnome-terminal htop firefox-i18n-ru firefox)
+PKGS=(mplayer totem alacritty gnome-maps gnome-software gnome-terminal htop firefox-i18n-ru firefox illogical-impulse-kde dolphin)
 for pkg in "${PKGS[@]}"; do
   if pacman -Q "$pkg" &>/dev/null; then
     sudo pacman -R --noconfirm "$pkg"
