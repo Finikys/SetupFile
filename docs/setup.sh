@@ -51,29 +51,35 @@ if ! sudo pacman -Syu --noconfirm; then
 fi
 
 # ===== 📦 Установка официальных пакетов =====
-PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code tlp)
+PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code tlp powertop)
 say "$GREEN" "📦 Installing official packages…"
-sudo pacman -S "${PACKAGES[@]}"
+sudo pacman -S --noconfirm --needed "${PACKAGES[@]}"
 
-sudo systemctl enable tlp --now 
+sudo systemctl enable tlp --now
+sudo systemctl mask power-profiles-daemon.service
 
-# ===== 🚀 Установка yay и AUR-пакетов =====
-if ! command -v yay &>/dev/null; then
-    say "$YELLOW" "Yay not found, installing..."
-    sudo pacman -S --needed git base-devel
-    git clone https://aur.archlinux.org/yay.git /tmp/yay
-    cd /tmp/yay
-    makepkg -si --noconfirm
-    cd -
-    rm -rf /tmp/yay
-fi
+# ===== 🛠️ Настройка powertop и его параметров =====
+sudo powertop --auto-tune
 
-AUR_PACKAGES=(google-chrome byedpi)
-say "$GREEN" "📦 Installing AUR packages…"
-yay -S --noconfirm --needed "${AUR_PACKAGES[@]}"
+# Настроим сохранение параметров при запуске
+sudo mkdir -p /etc/systemd/system/powertop.service.d
+cat | sudo tee /etc/systemd/system/powertop.service <<EOF
+[Unit]
+Description=Powertop tunings
+After=multi-user.target
 
-# ===== 🎞️ Настройка mpv =====
-say "$MAGENTA" "🎞️ Configuring MPV…"
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/powertop --auto-tune
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable powertop.service
+
+# ===== 🎥 Настройка mpv =====
+say "$MAGENTA" "🎥 Configuring MPV…"
 mkdir -p ~/.config/mpv/scripts
 curl -L -o ~/.config/mpv/scripts/fuzzydir.lua https://raw.githubusercontent.com/sibwaf/mpv-scripts/master/fuzzydir.lua
 
@@ -107,13 +113,9 @@ HYPRCONF=~/.config/hypr/hyprland.conf
 mkdir -p ~/.config/hypr
 touch "$HYPRCONF"
 
-# Проверим, есть ли секция input
 if grep -q "^\s*input\s*{" "$HYPRCONF"; then
-    # Удаляем старые настройки kb_layout и kb_options внутри input
     sed -i '/^\s*input\s*{/,/}/ s/^\s*kb_layout\s*=.*/    kb_layout = us,ru/' "$HYPRCONF"
     sed -i '/^\s*input\s*{/,/}/ s/^\s*kb_options\s*=.*/    kb_options = grp:alt_shift_toggle/' "$HYPRCONF"
-
-    # Добавляем если их не было
     if ! grep -Pzo "input\s*{[^}]*\bkb_layout\b" "$HYPRCONF" &>/dev/null; then
         sed -i '/^\s*input\s*{.*/a \    kb_layout = us,ru' "$HYPRCONF"
     fi
@@ -121,7 +123,6 @@ if grep -q "^\s*input\s*{" "$HYPRCONF"; then
         sed -i '/^\s*input\s*{.*/a \    kb_options = grp:alt_shift_toggle' "$HYPRCONF"
     fi
 else
-    # Добавим новую секцию input
     cat >> "$HYPRCONF" <<EOF
 
 # Added by Astolfo's setup script ✨
