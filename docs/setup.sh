@@ -106,6 +106,26 @@ for key in "${!CONFIG_LINES[@]}"; do
     fi
 done
 
+# Привязки клавиш
+say "$MAGENTA" "🎯 Configuring MPV keybindings…"
+INPUT=~/.config/mpv/input.conf
+mkdir -p "$(dirname "$INPUT")"
+cat >> "$INPUT" <<EOF
+
+# ◀ ▶ – переключение глав
+Left add chapter -1
+Right add chapter 1
+
+# Up ↓ – переключение файлов в плейлисте
+Up playlist-next
+Down playlist-prev
+
+# ⇧ Shift+стрелки – перемотка ±85 секунд
+Shift+Left seek -85
+Shift+Right seek 85
+EOF
+say "$GREEN" "→ input.conf updated with keybindings"
+
 # ===== ⌨️ Настройка русской раскладки для Hyprland =====
 say "$MAGENTA" "⌨️ Configuring Russian keyboard layout for Hyprland…"
 
