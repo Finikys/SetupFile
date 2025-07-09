@@ -158,28 +158,27 @@ say "$GREEN" "→ Russian layout configured! You can switch layouts with Alt+Shi
 # ===== Configure nwg-dock-hyprland =====
 say "$BLUE" "Configuring nwg-dock-hyprland with translucent background..."
 
-# Подготовка директорий
+# 1. Создаём стиль CSS
 mkdir -p ~/.config/nwg-dock-hyprland
-mkdir -p ~/.config/hypr
-
-# Создание CSS с прозрачным фоном (~80% opacity)
 cat > ~/.config/nwg-dock-hyprland/style.css <<EOF
 #dock {
-  background-color: rgba(27,25,25,0.8); /* #1b1919 с прозрачностью 0.8 */
-  border-radius: 6px;
-  padding: 4px;
+  background-color: rgba(27,25,25,0.85);
+  border-radius: 12px;
+  padding: 6px;
 }
 #dock button {
   background-color: transparent;
 }
 #dock button:hover {
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(255,255,255,0.12);
 }
 EOF
-say "$GREEN" "→ Created style.css for translucent dock"
+say "$GREEN" "→ style.css created"
 
-# Добавление строки запуска в конфиг Hyprland
+# 2. Настройка автозапуска в конфиге Hyprland
 HYPR=~/.config/hypr/hyprland.conf
+mkdir -p "$(dirname "$HYPR")"
+
 if ! grep -q "exec-once.*nwg-dock-hyprland" "$HYPR"; then
   cat >> "$HYPR" <<EOF
 
@@ -190,7 +189,7 @@ exec-once = sleep 5 && nwg-dock-hyprland \
   -i 48 \
   -mb 10 -ml 10 -mr 10 -mt 10 \
   -l overlay \
-  -hd 200 \
+  -hd 300 \
   -nolauncher \
   -s style.css \
   -c "nautilus" \
@@ -200,11 +199,12 @@ exec-once = sleep 5 && nwg-dock-hyprland \
   -c "steam" \
   -c "discord"
 EOF
-  say "$GREEN" "→ Added exec-once for nwg-dock-hyprland to hyprland.conf"
+  say "$GREEN" "→ exec-once block added to hyprland.conf"
 else
-  say "$YELLOW" "nwg-dock-hyprland is already configured—skipping"
+  say "$YELLOW" "nwg-dock already configured — skipping"
 fi
 
-say "$YELLOW" "Please reload Hyprland (e.g. via 'hyprctl reload') to apply dock with translucent background."
+say "$YELLOW" "Reload Hyprland (e.g. 'hyprctl reload') to apply new dock settings."
+
 
 say "$GREEN" "Setup complete. Please reload Hyprland to apply nwg-dock settings."
