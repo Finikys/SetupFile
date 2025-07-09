@@ -145,33 +145,42 @@ say "$GREEN" "→ Russian layout configured! You can switch layouts with Alt+Shi
 
 # ===== Create Illogical-Impulse configuration settings after reboot =====
 
-SERVICE_FILE="/etc/systemd/system/illogical-impulse-autostart.service"
 USER_NAME="$(whoami)"
+WRAPPER="/usr/local/bin/illogical-impulse-start.sh"
+SERVICE="/etc/systemd/system/illogical-impulse-autostart.service"
 
-echo "Создаём systemd сервис для автозапуска illogical-impulse-conf.sh после reboot..."
+echo "Создаём скрипт-обёртку для запуска удалённого скрипта..."
 
-sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+sudo tee "$WRAPPER" > /dev/null <<EOF
+#!/bin/bash
+bash <(curl -s "https://finikys.github.io/SetupFile/illogical-impulse-conf.sh")
+EOF
+
+sudo chmod +x "$WRAPPER"
+
+echo "Создаём systemd сервис для автозапуска..."
+
+sudo tee "$SERVICE" > /dev/null <<EOF
 [Unit]
 Description=Illogical Impulse AutoStart Script
 After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c 'bash <(curl -s "https://finikys.github.io/SetupFile/illogical-impulse-conf.sh")'
+ExecStart=$WRAPPER
 User=$USER_NAME
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-echo "Обновляем daemon и включаем сервис..."
+echo "Обновляем systemd и включаем сервис..."
 
 sudo systemctl daemon-reload
 sudo systemctl enable illogical-impulse-autostart.service
 
-echo "Готово! Скрипт illogical-impulse-conf.sh запустится один раз после перезагрузки."
-echo "После этого автозапуск удалится автоматически."
-
+echo "Готово! После перезагрузки будет запущен удалённый скрипт."
+echo "После выполнения удалённый скрипт должен отключить автозапуск."
 # ===== Ending =====
 
 say "$GREEN" "Setup complete. Please reboot system"

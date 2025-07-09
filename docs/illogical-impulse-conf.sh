@@ -32,4 +32,5 @@ echo "The configuration is successfully updated."
 
 sudo systemctl disable illogical-impulse-autostart.service
 sudo rm /etc/systemd/system/illogical-impulse-autostart.service
+sudo rm /usr/local/bin/illogical-impulse-start.sh
 sudo systemctl daemon-reload
