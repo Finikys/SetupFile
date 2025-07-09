@@ -155,4 +155,4 @@ fi
 
 say "$GREEN" "→ Russian layout configured! You can switch layouts with Alt+Shift."
 
-say "$GREEN" "Setup complete. Please reload Hyprland to apply nwg-dock settings."
+say "$GREEN" "Setup complete. Please reboot system"
