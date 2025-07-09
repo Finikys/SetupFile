@@ -85,12 +85,16 @@ curl -sfL https://raw.githubusercontent.com/sibwaf/mpv-scripts/master/fuzzydir.l
 
 CONF=~/.config/mpv/mpv.conf
 mkdir -p "$(dirname "$CONF")"; touch "$CONF"
+
 declare -A mpv_conf=(
-  [keep-open]=yes
-  [audio-file-auto]=fuzzy
-  [sub-auto]=fuzzy
-  [alang]=ru,en,ja
+    ["keep-open"]="yes"
+    ["audio-file-auto"]="fuzzy"
+    ["audio-file-paths"]="**"
+    ["sub-auto"]="fuzzy"
+    ["sub-file-path"]="**"
+    ["alang"]="ru,en,ja"
 )
+
 for k in "${!mpv_conf[@]}"; do
   v=${mpv_conf[$k]}
   grep -q "^$k=" "$CONF" && \
