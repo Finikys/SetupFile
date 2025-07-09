@@ -2,6 +2,7 @@
 set -e
 trap 'echo -e "${RED}Error on line $LINENO — aborting.${RESET}"' ERR
 
+sudo pacman -S --needed --noconfirm git curl perl wget gcc clang 
 bash -c "$(curl -s https://end-4.github.io/dots-hyprland-wiki/setup.sh)"
 
 # ===== Colors =====
@@ -39,7 +40,7 @@ done
 # ===== Update and install base packages =====
 say "$CYAN" "Updating system and installing essential tools..."
 sudo pacman -Syu --noconfirm
-PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code tlp powertop)
+PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code tlp powertop jq)
 sudo pacman -S --needed "${PACKAGES[@]}"
 
 # ===== Installing yay and AUR packages =====
@@ -132,7 +133,6 @@ else
     # Let's add a new input section
     cat >> "$HYPRCONF" <<EOF
 
-# Added by Astolfo's setup script ✨
 input {
     kb_layout = us,ru
     kb_variant =
