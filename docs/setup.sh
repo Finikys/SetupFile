@@ -14,7 +14,7 @@ say() {
     echo -e "${COLOR}$*${RESET}"
 }
 
-say "$MAGENTA" "Astolfo-chan: starting the setup…"
+say "$MAGENTA" "Starting the setup…"
 
 # Confirmation
 while true; do
@@ -91,7 +91,7 @@ declare -A mpv_conf=(
     ["audio-file-auto"]="fuzzy"
     ["audio-file-paths"]="**"
     ["sub-auto"]="fuzzy"
-    ["sub-file-path"]="**"
+    ["sub-file-paths"]="**"
     ["alang"]="ru,en,ja"
 )
 
@@ -108,8 +108,8 @@ mkdir -p "$(dirname "$INPUT")"
 cat >> "$INPUT" <<EOF
 
 # Left/Right – chapter navigation
-Left add chapter -1
-Right add chapter 1
+Ctrl+Left add chapter -1
+Ctrl+Right add chapter 1
 
 # Up/Down – playlist navigation
 Up playlist-next
