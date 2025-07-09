@@ -20,9 +20,9 @@
 1. Убедитесь, что используете Arch Linux или производный дистрибутив
 2. Запустите скрипт:
 
-\```
+```bash
 bash <(curl -s "https://finikys.github.io/SetupFile/setup.sh")
-\```
+```
 
 ## Что делает скрипт
 ### 1. Инициализация
@@ -44,23 +44,23 @@ bash <(curl -s "https://finikys.github.io/SetupFile/setup.sh")
 ### 3. Оптимизация системы
 - Активация сервисов:
   
-\```
+```bash
   sudo systemctl enable --now tlp
   sudo systemctl mask power-profiles-daemon
   sudo systemctl enable powertop.service
-\```
+```
 
 - Автоматическая настройка powertop:
   
-\```
+```bash
   sudo powertop --auto-tune
-\```
+```
 
 ### 4. Настройка приложений
 **MPV**:
 - Fuzzy-поиск аудио и субтитров
 - Кастомные хоткеи:
-  - <kdb>Ctrl</kdb> + <kdb>← / <kdb>→</kdb> : переключение глав
+  - <kdb>Ctrl</kdb> + <kdb>←</kdb> / <kdb>→</kdb> : переключение глав
   - <kdb>Shift</kdb> + <kdb>←</kdb> / <kdb>→</kdb> : перемотка на 85 сек
   - <kdb>↑</kdb> / <kdb>↓</kdb> : навигация по плейлисту
 
