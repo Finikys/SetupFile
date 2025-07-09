@@ -26,7 +26,7 @@ while true; do
     esac
 done
 
-# Remove unneeded packages
+# ===== Remove unneeded packages =====
 say "$BLUE" "Removing unnecessary packages..."
 PKGS=(mplayer totem alacritty gnome-maps gnome-software gnome-terminal htop firefox-i18n-ru firefox illogical-impulse-kde dolphin)
 for pkg in "${PKGS[@]}"; do
@@ -36,13 +36,13 @@ for pkg in "${PKGS[@]}"; do
     fi
 done
 
-# Update and install base packages
+# ===== Update and install base packages =====
 say "$CYAN" "Updating system and installing essential tools..."
 sudo pacman -Syu --noconfirm
 PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code tlp powertop)
 sudo pacman -S --needed "${PACKAGES[@]}"
 
-# Установка yay и AUR-пакетов 
+# ===== Installing yay and AUR packages =====
 if ! command -v yay &>/dev/null; then
     say "$YELLOW" "Yay not found, installing..."
     sudo pacman -S --needed git base-devel
@@ -57,7 +57,7 @@ AUR_PACKAGES=(google-chrome)
 say "$GREEN" "Installing AUR packages…"
 yay -S --noconfirm --needed "${AUR_PACKAGES[@]}"
 
-# Power management
+# ===== Power management =====
 say "$BLUE" "Configuring power management..."
 sudo systemctl enable tlp --now
 sudo systemctl mask power-profiles-daemon
@@ -77,63 +77,51 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable powertop.service
 
-# Configure mpv
+# ===== Setting up mpv =====
 say "$BLUE" "Configuring mpv settings..."
+
+# Installing scripts
 mkdir -p ~/.config/mpv/scripts
+
 curl -sfL https://raw.githubusercontent.com/sibwaf/mpv-scripts/master/fuzzydir.lua \
      -o ~/.config/mpv/scripts/fuzzydir.lua || true
 
+# Main config
 CONF=~/.config/mpv/mpv.conf
-mkdir -p "$(dirname "$CONF")"; touch "$CONF"
+mkdir -p "$(dirname "$CONF")"
+touch "$CONF"
 
-declare -A mpv_conf=(
-    ["keep-open"]="yes"
-    ["audio-file-auto"]="fuzzy"
-    ["audio-file-paths"]="**"
-    ["sub-auto"]="fuzzy"
-    ["sub-file-paths"]="**"
-    ["alang"]="ru,en,ja"
-)
-
-for k in "${!mpv_conf[@]}"; do
-  v=${mpv_conf[$k]}
-  grep -q "^$k=" "$CONF" && \
-    sed -i "s|^$k=.*|$k=$v|" "$CONF" || \
-    echo "$k=$v" >> "$CONF"
+# Options: delete old ones, add in the desired order
+for config in \
+    "audio-file-auto=fuzzy" \
+    "audio-file-paths=**" \
+    "sub-auto=fuzzy" \
+    "sub-file-paths=**" \
+    "alang=ru,en,ja" \
+    "directory-mode=recursive" \
+    "autocreate-playlist=same" \
+    "keep-open=yes"
+do
+    key="${config%%=*}"
+    sed -i "/^${key}=/d" "$CONF"
+    echo "$config" >> "$CONF"
 done
 
-say "$BLUE" "Configuring mpv keybindings..."
-INPUT=~/.config/mpv/input.conf
-mkdir -p "$(dirname "$INPUT")"
-cat >> "$INPUT" <<EOF
-
-# Left/Right – chapter navigation
-Ctrl+Left add chapter -1
-Ctrl+Right add chapter 1
-
-# Up/Down – playlist navigation
-Up playlist-next
-Down playlist-prev
-
-# Shift+Left/Right – seek ±85 seconds
-Shift+Left seek -85
-Shift+Right seek 85
-EOF
-
-# Configuring Russian keyboard layout for Hyprland
+say "$GREEN" "mpv configured: external audio fuzzy, субтитры fuzzy, рекурсивный плейлист и автозагрузка соседних файлов."
+# ===== Configuring Russian keyboard layout for Hyprland =====
 say "$MAGENTA" "Configuring Russian keyboard layout for Hyprland…"
 
 HYPRCONF=~/.config/hypr/hyprland.conf
 mkdir -p ~/.config/hypr
 touch "$HYPRCONF"
 
-# Проверим, есть ли секция input
+# Let's check if there is an input section
 if grep -q "^\s*input\s*{" "$HYPRCONF"; then
-    # Удаляем старые настройки kb_layout и kb_options внутри input
+    # Remove old kb_layout and kb_options settings inside input
     sed -i '/^\s*input\s*{/,/}/ s/^\s*kb_layout\s*=.*/    kb_layout = us,ru/' "$HYPRCONF"
     sed -i '/^\s*input\s*{/,/}/ s/^\s*kb_options\s*=.*/    kb_options = grp:alt_shift_toggle/' "$HYPRCONF"
 
-    # Добавляем если их не было
+    # Add if they were not there
     if ! grep -Pzo "input\s*{[^}]*\bkb_layout\b" "$HYPRCONF" &>/dev/null; then
         sed -i '/^\s*input\s*{.*/a \    kb_layout = us,ru' "$HYPRCONF"
     fi
@@ -141,7 +129,7 @@ if grep -q "^\s*input\s*{" "$HYPRCONF"; then
         sed -i '/^\s*input\s*{.*/a \    kb_options = grp:alt_shift_toggle' "$HYPRCONF"
     fi
 else
-    # Добавим новую секцию input
+    # Let's add a new input section
     cat >> "$HYPRCONF" <<EOF
 
 # Added by Astolfo's setup script ✨
@@ -154,5 +142,32 @@ EOF
 fi
 
 say "$GREEN" "→ Russian layout configured! You can switch layouts with Alt+Shift."
+
+# ===== Illogical-Impulse configuration settings =====
+
+CONFIG="$HOME/.config/illogical-impulse/config.json"
+
+if [[ ! -f "$CONFIG" ]]; then
+  echo "The configuration file was not found: $CONFIG"
+  exit 1
+fi
+
+cp "$CONFIG" "$CONFIG.bak"
+echo "A reserve copy has been created: $CONFIG.bak"
+
+jq '
+  .dock.enable = true |
+  .dock.pinnedApps = [
+    "google-chrome",
+    "org.telegram.desktop",
+    "obsidian",
+    "steam",
+    "discord"
+  ]
+' "$CONFIG" > "$CONFIG.tmp" && mv "$CONFIG.tmp" "$CONFIG"
+
+echo "The configuration is successfully updated."
+
+# ===== Ending =====
 
 say "$GREEN" "Setup complete. Please reboot system"
