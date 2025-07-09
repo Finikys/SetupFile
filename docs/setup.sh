@@ -108,7 +108,27 @@ do
     echo "$config" >> "$CONF"
 done
 
-say "$GREEN" "mpv configured: external audio fuzzy, субтитры fuzzy, рекурсивный плейлист и автозагрузка соседних файлов."
+# Key bindings
+say "$MAGENTA" "🎯 Configuring MPV keybindings…"
+INPUT=~/.config/mpv/input.conf
+mkdir -p "$(dirname "$INPUT")"
+cat >> "$INPUT" <<EOF
+
+# Ctrl+arrow – switch chapters
+Ctrl+Left add chapter -1
+Ctrl+Right add chapter 1
+
+# Up and down – switching files in a playlist
+Up playlist-next
+Down playlist-prev
+
+# Shift+arrow – rewind ±85 seconds
+Shift+Left seek -85
+Shift+Right seek 85
+EOF
+say "$GREEN" "→ input.conf updated with keybindings"
+
+say "$GREEN" "mpv configured: external audio fuzzy, subtitles fuzzy, recursive playlist and autoload adjacent files."
 # ===== Configuring Russian keyboard layout for Hyprland =====
 say "$MAGENTA" "Configuring Russian keyboard layout for Hyprland…"
 
@@ -149,7 +169,7 @@ USER_NAME="$(whoami)"
 WRAPPER="/usr/local/bin/illogical-impulse-start.sh"
 SERVICE="/etc/systemd/system/illogical-impulse-autostart.service"
 
-echo "Создаём скрипт-обёртку для запуска удалённого скрипта..."
+echo "Create a wrapper script to run a remote script..."
 
 sudo tee "$WRAPPER" > /dev/null <<EOF
 #!/bin/bash
@@ -158,7 +178,7 @@ EOF
 
 sudo chmod +x "$WRAPPER"
 
-echo "Создаём systemd сервис для автозапуска..."
+echo "Create a systemd service for autostart..."
 
 sudo tee "$SERVICE" > /dev/null <<EOF
 [Unit]
@@ -174,13 +194,13 @@ User=$USER_NAME
 WantedBy=multi-user.target
 EOF
 
-echo "Обновляем systemd и включаем сервис..."
+echo "Update systemd and enable the service..."
 
 sudo systemctl daemon-reload
 sudo systemctl enable illogical-impulse-autostart.service
 
-echo "Готово! После перезагрузки будет запущен удалённый скрипт."
-echo "После выполнения удалённый скрипт должен отключить автозапуск."
+echo "Done! After reboot the remote script will be launched."
+echo "After execution, the remote script should disable autorun."
 # ===== Ending =====
 
 say "$GREEN" "Setup complete. Please reboot system"
