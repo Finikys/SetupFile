@@ -163,7 +163,14 @@ jq '
     "obsidian",
     "steam",
     "discord"
-  ]
+  ] |
+  .dock.utilButtons = {
+    showColorPicker: true,
+    showDarkModeToggle: false,
+    showKeyboardToggle: false,
+    showMicToggle: false,
+    showScreenSnip: false
+  }
 ' "$CONFIG" > "$CONFIG.tmp" && mv "$CONFIG.tmp" "$CONFIG"
 
 echo "The configuration is successfully updated."
