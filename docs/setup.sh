@@ -151,21 +151,44 @@ fi
 
 say "$GREEN" "→ Russian layout configured! You can switch layouts with Alt+Shift."
 
-# Configure nwg-dock-hyprland
-say "$BLUE" "Configuring nwg-dock-hyprland..."
-HYPR=~/.config/hypr/hyprland.conf
-mkdir -p ~/.config/hypr
-grep -q "exec-once =.*nwg-dock-hyprland" "$HYPR" 2>/dev/null || cat >> "$HYPR" <<EOF
+# ===== Configure nwg-dock-hyprland =====
+say "$BLUE" "Configuring nwg-dock-hyprland with translucent background..."
 
-# nwg‑dock: visible on all monitors, larger hot‑zone, pinned apps only
+# Подготовка директорий
+mkdir -p ~/.config/nwg-dock-hyprland
+mkdir -p ~/.config/hypr
+
+# Создание CSS с прозрачным фоном (~80% opacity)
+cat > ~/.config/nwg-dock-hyprland/style.css <<EOF
+#dock {
+  background-color: rgba(27,25,25,0.8); /* #1b1919 с прозрачностью 0.8 */
+  border-radius: 6px;
+  padding: 4px;
+}
+#dock button {
+  background-color: transparent;
+}
+#dock button:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+EOF
+say "$GREEN" "→ Created style.css for translucent dock"
+
+# Добавление строки запуска в конфиг Hyprland
+HYPR=~/.config/hypr/hyprland.conf
+if ! grep -q "exec-once.*nwg-dock-hyprland" "$HYPR"; then
+  cat >> "$HYPR" <<EOF
+
+# nwg-dock-hyprland: translucent dock above windows on all monitors
 exec-once = sleep 5 && nwg-dock-hyprland \
   -d \
   -p bottom \
   -i 48 \
   -mb 10 -ml 10 -mr 10 -mt 10 \
-  -x \
+  -l overlay \
   -hd 200 \
   -nolauncher \
+  -s style.css \
   -c "nautilus" \
   -c "google-chrome-stable" \
   -c "telegram-desktop" \
@@ -173,5 +196,11 @@ exec-once = sleep 5 && nwg-dock-hyprland \
   -c "steam" \
   -c "discord"
 EOF
+  say "$GREEN" "→ Added exec-once for nwg-dock-hyprland to hyprland.conf"
+else
+  say "$YELLOW" "nwg-dock-hyprland is already configured—skipping"
+fi
+
+say "$YELLOW" "Please reload Hyprland (e.g. via 'hyprctl reload') to apply dock with translucent background."
 
 say "$GREEN" "Setup complete. Please reload Hyprland to apply nwg-dock settings."
