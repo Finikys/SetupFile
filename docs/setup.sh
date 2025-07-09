@@ -157,4 +157,45 @@ exec-once = sleep 5 && nwg-dock-hyprland \
   -c "discord"
 EOF
 
+# ===== 🖥️ Настройка разрешения экрана =====
+say "$CYAN" "Configure screen resolution? (you can skip or choose a common resolution)"
+
+PS3="Select resolution (or 'skip'): "
+options=("1920x1080@60" "1280x720@60" "Skip")
+select opt in "${options[@]}"; do
+  case $opt in
+    "1920x1080@60")
+      RES="1920x1080@60"
+      say "$GREEN" "Selected resolution: $RES"
+      break
+      ;;
+    "1280x720@60")
+      RES="1280x720@60"
+      say "$GREEN" "Selected resolution: $RES"
+      break
+      ;;
+    "Skip")
+      say "$YELLOW" "Skipping resolution configuration"
+      RES=""
+      break
+      ;;
+    *) say "$YELLOW" "Invalid option";;
+  esac
+done
+
+if [ -n "$RES" ]; then
+  HYPR=~/.config/hypr/hyprland.conf
+  mkdir -p "$(dirname "$HYPR")"
+
+  if grep -q "^monitor=" "$HYPR"; then
+    sed -i "s/^monitor=.*/monitor=auto,${RES},0x0,1/" "$HYPR"
+  else
+    echo -e "\n# Automatically set resolution\nmonitor=auto,${RES},0x0,1" >> "$HYPR"
+  fi
+
+  say "$GREEN" "Resolution set in hyprland.conf: ${RES}"
+  say "$YELLOW" "Please run 'hyprctl reload' or restart Hyprland to apply."
+fi
+
+
 say "$GREEN" "Setup complete. Please reload Hyprland to apply nwg-dock settings."
