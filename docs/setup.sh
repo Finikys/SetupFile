@@ -53,7 +53,7 @@ if ! command -v yay &>/dev/null; then
     rm -rf /tmp/yay
 fi
 
-AUR_PACKAGES=(google-chrome v2rayn)
+AUR_PACKAGES=(google-chrome)
 say "$GREEN" "Installing AUR packages…"
 yay -S --noconfirm --needed "${AUR_PACKAGES[@]}"
 
