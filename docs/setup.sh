@@ -140,8 +140,15 @@ HYPR=~/.config/hypr/hyprland.conf
 mkdir -p ~/.config/hypr
 grep -q "exec-once =.*nwg-dock-hyprland" "$HYPR" 2>/dev/null || cat >> "$HYPR" <<EOF
 
-# launch nwg-dock on all monitors, pinned apps only
-exec-once = sleep 5 && nwg-dock-hyprland -d -p bottom -i 48 -mb 10 -ml 10 -mr 10 -mt 10 -x -nolauncher \
+# nwg‑dock: visible on all monitors, larger hot‑zone, pinned apps only
+exec-once = sleep 5 && nwg-dock-hyprland \
+  -d \
+  -p bottom \
+  -i 48 \
+  -mb 10 -ml 10 -mr 10 -mt 10 \
+  -x \
+  -hd 200 \
+  -nolauncher \
   -c "nautilus" \
   -c "google-chrome-stable" \
   -c "telegram-desktop" \
