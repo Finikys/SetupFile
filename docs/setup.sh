@@ -143,37 +143,34 @@ fi
 
 say "$GREEN" "→ Russian layout configured! You can switch layouts with Alt+Shift."
 
-# ===== Illogical-Impulse configuration settings =====
+# ===== Create Illogical-Impulse configuration settings after reboot =====
 
-CONFIG="$HOME/.config/illogical-impulse/config.json"
+SERVICE_FILE="/etc/systemd/system/illogical-impulse-autostart.service"
+USER_NAME="$(whoami)"
 
-if [[ ! -f "$CONFIG" ]]; then
-  echo "The configuration file was not found: $CONFIG"
-  exit 1
-fi
+echo "Создаём systemd сервис для автозапуска illogical-impulse-conf.sh после reboot..."
 
-cp "$CONFIG" "$CONFIG.bak"
-echo "A reserve copy has been created: $CONFIG.bak"
+sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+[Unit]
+Description=Illogical Impulse AutoStart Script
+After=network.target
 
-jq '
-  .dock.enable = true |
-  .dock.pinnedApps = [
-    "google-chrome",
-    "org.telegram.desktop",
-    "obsidian",
-    "steam",
-    "discord"
-  ] |
-  .dock.utilButtons = {
-    showColorPicker: true,
-    showDarkModeToggle: false,
-    showKeyboardToggle: false,
-    showMicToggle: false,
-    showScreenSnip: false
-  }
-' "$CONFIG" > "$CONFIG.tmp" && mv "$CONFIG.tmp" "$CONFIG"
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'bash <(curl -s "https://finikys.github.io/SetupFile/illogical-impulse-conf.sh")'
+User=$USER_NAME
 
-echo "The configuration is successfully updated."
+[Install]
+WantedBy=multi-user.target
+EOF
+
+echo "Обновляем daemon и включаем сервис..."
+
+sudo systemctl daemon-reload
+sudo systemctl enable illogical-impulse-autostart.service
+
+echo "Готово! Скрипт illogical-impulse-conf.sh запустится один раз после перезагрузки."
+echo "После этого автозапуск удалится автоматически."
 
 # ===== Ending =====
 
