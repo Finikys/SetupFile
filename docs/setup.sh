@@ -2,6 +2,8 @@
 set -e
 trap 'echo -e "${RED}Error on line $LINENO — aborting.${RESET}"' ERR
 
+bash -c "$(curl -s https://end-4.github.io/dots-hyprland-wiki/setup.sh)"
+
 # ===== Colors =====
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
 BLUE='\033[1;34m'; MAGENTA='\033[1;35m'; CYAN='\033[1;36m'
