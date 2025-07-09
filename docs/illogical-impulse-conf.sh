@@ -19,7 +19,7 @@ jq '
     "steam",
     "discord"
   ] |
-  .dock.utilButtons = {
+  .bar.utilButtons = {
     showColorPicker: true,
     showDarkModeToggle: false,
     showKeyboardToggle: false,
