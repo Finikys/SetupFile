@@ -38,7 +38,7 @@ done
 say "$CYAN" "Updating system and installing essential tools..."
 sudo pacman -Syu --noconfirm
 PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code tlp powertop nwg-dock-hyprland)
-sudo pacman -S --noconfirm --needed "${PACKAGES[@]}"
+sudo pacman -S --needed "${PACKAGES[@]}"
 
 # Power management
 say "$BLUE" "Configuring power management..."
