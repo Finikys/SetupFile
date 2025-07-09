@@ -42,6 +42,21 @@ sudo pacman -Syu --noconfirm
 PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code tlp powertop nwg-dock-hyprland)
 sudo pacman -S --needed "${PACKAGES[@]}"
 
+# Установка yay и AUR-пакетов 
+if ! command -v yay &>/dev/null; then
+    say "$YELLOW" "Yay not found, installing..."
+    sudo pacman -S --needed git base-devel
+    git clone https://aur.archlinux.org/yay.git /tmp/yay
+    cd /tmp/yay
+    makepkg -si --noconfirm
+    cd -
+    rm -rf /tmp/yay
+fi
+
+AUR_PACKAGES=(google-chrome v2rayn)
+say "$GREEN" "Installing AUR packages…"
+yay -S --noconfirm --needed "${AUR_PACKAGES[@]}"
+
 # Power management
 say "$BLUE" "Configuring power management..."
 sudo systemctl enable tlp --now
