@@ -2,9 +2,6 @@
 set -e
 trap 'echo -e "${RED}Error on line $LINENO — aborting.${RESET}"' ERR
 
-sudo pacman -S --needed --noconfirm git curl perl wget gcc clang 
-bash -c "$(curl -s https://end-4.github.io/dots-hyprland-wiki/setup.sh)"
-
 # ===== Colors =====
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
 BLUE='\033[1;34m'; MAGENTA='\033[1;35m'; CYAN='\033[1;36m'
@@ -163,44 +160,38 @@ fi
 
 say "$GREEN" "→ Russian layout configured! You can switch layouts with Alt+Shift."
 
-# ===== Create Illogical-Impulse configuration settings after reboot =====
+# ===== Illogical-Impulse configuration settings =====
 
-USER_NAME="$(whoami)"
-WRAPPER="/usr/local/bin/illogical-impulse-start.sh"
-SERVICE="/etc/systemd/system/illogical-impulse-autostart.service"
+CONFIG="$HOME/.config/illogical-impulse/config.json"
 
-echo "Create a wrapper script to run a remote script..."
+if [[ ! -f "$CONFIG" ]]; then
+  echo "The configuration file was not found: $CONFIG"
+  exit 1
+fi
 
-sudo tee "$WRAPPER" > /dev/null <<EOF
-#!/bin/bash
-bash <(curl -s "https://finikys.github.io/SetupFile/illogical-impulse-conf.sh")
-EOF
+cp "$CONFIG" "$CONFIG.bak"
+echo "A reserve copy has been created: $CONFIG.bak"
 
-sudo chmod +x "$WRAPPER"
+jq '
+  .dock.enable = true |
+  .dock.pinnedApps = [
+    "google-chrome",
+    "org.telegram.desktop",
+    "obsidian",
+    "steam",
+    "discord"
+  ] |
+  .bar.utilButtons = {
+    showColorPicker: true,
+    showDarkModeToggle: false,
+    showKeyboardToggle: false,
+    showMicToggle: false,
+    showScreenSnip: false
+  }
+' "$CONFIG" > "$CONFIG.tmp" && mv "$CONFIG.tmp" "$CONFIG"
 
-echo "Create a systemd service for autostart..."
+echo "The configuration is successfully updated."
 
-sudo tee "$SERVICE" > /dev/null <<EOF
-[Unit]
-Description=Illogical Impulse AutoStart Script
-After=network.target
-
-[Service]
-Type=oneshot
-ExecStart=$WRAPPER
-User=$USER_NAME
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-echo "Update systemd and enable the service..."
-
-sudo systemctl daemon-reload
-sudo systemctl enable illogical-impulse-autostart.service
-
-echo "Done! After reboot the remote script will be launched."
-echo "After execution, the remote script should disable autorun."
 # ===== Ending =====
 
 say "$GREEN" "Setup complete. Please reboot system"
