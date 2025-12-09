@@ -55,26 +55,6 @@ AUR_PACKAGES=(google-chrome)
 say "$GREEN" "Installing AUR packages…"
 yay -S --noconfirm --needed "${AUR_PACKAGES[@]}"
 
-# ===== Power management =====
-say "$BLUE" "Configuring power management..."
-sudo systemctl enable tlp --now
-sudo systemctl mask power-profiles-daemon
-sudo powertop --auto-tune
-sudo tee /etc/systemd/system/powertop.service > /dev/null <<EOF
-[Unit]
-Description=Powertop tuning
-After=multi-user.target
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/powertop --auto-tune
-
-[Install]
-WantedBy=multi-user.target
-EOF
-sudo systemctl daemon-reload
-sudo systemctl enable powertop.service
-
 # ===== Setting up mpv =====
 say "$BLUE" "Configuring mpv settings..."
 
