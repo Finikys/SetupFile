@@ -37,7 +37,7 @@ done
 # ===== Update and install base packages =====
 say "$CYAN" "Updating system and installing essential tools..."
 sudo pacman -Syu --noconfirm
-PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code tlp powertop jq)
+PACKAGES=(git mpv telegram-desktop discord steam btop curl perl qbittorrent obsidian code tlp powertop jq localsend)
 sudo pacman -S --needed "${PACKAGES[@]}"
 
 # ===== Installing yay and AUR packages =====
